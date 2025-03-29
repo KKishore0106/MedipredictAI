@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <!-- Dashboard Layout -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <!-- Logo -->
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-semibold text-blue-700 ml-2">MediPredict AI</span>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="User Avatar" class="w-full h-full">
+                    </div>
+                    <h3 class="user-name">{{ current_user.name }}</h3>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-link {{ 'active' if request.path == url_for('dashboard') else '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('predictions') }}" class="nav-link {{ 'active' if request.path == url_for('predictions') else '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Predictions</span>
+                </a>
+                <a href="{{ url_for('chat') }}" class="nav-link {{ 'active' if request.path == url_for('chat') else '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <span>Chat with AI</span>
+                </a>
+                <a href="{{ url_for('settings') }}" class="nav-link {{ 'active' if request.path == url_for('settings') else '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Settings</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link {{ 'active' if request.path == url_for('logout') else '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <h1 class="welcome-message">Welcome back, {{ current_user.name }}!</h1>
+                        <div class="flex items-center">
+                            <span class="welcome-subtext">Ready to check your health today?</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary">
+                        Start New Diagnosis
+                    </button>
+                </div>
+            </header>
+
+            <!-- Health Status Overview -->
+            <section class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Prediction Card -->
+                    <div class="dashboard-card">
+                        <h3 class="card-header">Recent Predictions</h3>
+                        <div class="space-y-4">
+                            {% for prediction in recent_predictions %}
+                            <div class="prediction-item">
+                                <div>
+                                    <h4 class="prediction-condition">{{ prediction.condition }}</h4>
+                                    <p class="prediction-date">{{ prediction.date }}</p>
+                                </div>
+                                <div class="risk-level risk-level-{{ prediction.risk_level.lower() }}">
+                                    <span class="text-xs font-medium">{{ prediction.risk_level }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Suggestions Card -->
+                    <div class="dashboard-card">
+                        <h3 class="card-header">Health Insights</h3>
+                        <div class="space-y-4">
+                            {% for insight in health_insights %}
+                            <div class="prediction-item">
+                                <p class="prediction-condition">{{ insight.text }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="dashboard-card">
+                        <h3 class="card-header">Quick Stats</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="stat-item">
+                                <h4 class="stat-label">Total Predictions</h4>
+                                <p class="stat-value">{{ stats.total_predictions }}</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4 class="stat-label">Accuracy</h4>
+                                <p class="stat-value">{{ stats.accuracy }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Chatbot Section -->
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <h3 class="chatbot-title">AI Medical Assistant</h3>
+                <button class="chatbot-close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-messages">
+                <!-- Chat messages will be dynamically added here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message..." class="chat-input-text">
+                <button class="btn-primary">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .dashboard-container {
+        display: flex;
+        min-height: calc(100vh - 200px);
+    }
+
+    .sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e5e7eb;
+        padding: 2rem 1.5rem;
+    }
+
+    .sidebar-header {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .user-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .user-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-top: 1rem;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        color: #1f2937;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        background: #f3f4f6;
+        color: #2563eb;
+    }
+
+    .nav-link.active {
+        background: #2563eb;
+        color: white;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        background: white;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .welcome-message {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .welcome-subtext {
+        font-size: 1rem;
+        color: #6b7280;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .dashboard-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .prediction-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .prediction-condition {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .prediction-date {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .risk-level {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .risk-level-low {
+        background: #34c759;
+        color: white;
+    }
+
+    .risk-level-medium {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .risk-level-high {
+        background: #ef4444;
+        color: white;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .chatbot-container {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .chatbot-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .chatbot-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .chatbot-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .chat-messages {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .chat-input-text {
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        width: 100%;
+    }
+</style>
+{% endblock %}
